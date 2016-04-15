@@ -1,0 +1,17 @@
+more /tftpboot/fedit
+
+# Basic file editor for cisco routers.
+proc usage { } {
+puts “usage: fedit <filename>”
+}
+## BEGIN main
+if { [llength $argv] == 0 } {
+usage
+return
+}
+set outfile [open [lindex $argv 0] w]
+puts “Enter TEXT. End with the character <CTRL-C>”
+flush stdout
+set text [read stdin]
+puts -nonewline $outfile “$text”
+close $outfile
