@@ -1,0 +1,26 @@
+# Multiple file copy with tclsh for Cisco routers
+proc usage { } {
+puts "usage: fcopy <sourcepath/filemask> <destpath>"
+}
+## BEGIN main
+if { [llength $argv] != 2 } {
+usage
+return
+}
+set infiles [lindex $argv 0]
+set outpath [lindex $argv 1]
+set last [string last "/" $infiles]
+set inpath [string range $infiles 0 $last]
+puts "copy from $inpath to $outpath"
+# set files [ split [exec "dir $infiles | ex Directory of|bytes total|^\$"] "\n"]
+# puts $files
+ios_config "file prompt quiet"
+set files [exec "dir $infiles | ex Directory of|bytes total|^\$"]
+foreach line [ split $files "\n"] {
+  if { [regexp {([A-Za-z0-9]+).*} $line] } {
+    set file [ lindex $line end ]
+    puts "copy $inpath$file $outpath"
+    typeahead "\r\r"; exec "copy $inpath$file $outpath"
+  }
+}
+ios_config "no file prompt quiet"
